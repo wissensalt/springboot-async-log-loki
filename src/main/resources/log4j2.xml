@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration>
+  <Properties>
+    <Property name="logpath-location">./logs</Property>
+    <Property name="logfile-name">app.log</Property>
+    <Property name="archive">${logpath-location}/archive/</Property>
+    <Property name="interval">10</Property>
+  </Properties>
+
+<!--  <appender name="Loki" class="com.github.loki4j.logback.Loki4jAppender">-->
+<!--    <http>-->
+<!--      <url>http://localhost:3100/loki/api/v1/push</url>-->
+<!--    </http>-->
+<!--    <format>-->
+<!--      <label>-->
+<!--        <pattern>app=${name},host=${HOSTNAME},level=%level</pattern>-->
+<!--        <readMarkers>true</readMarkers>-->
+<!--      </label>-->
+<!--      <message>-->
+<!--        <pattern>-->
+<!--          {-->
+<!--          "level":"%level",-->
+<!--          "class":"%logger{36}",-->
+<!--          "thread":"%thread",-->
+<!--          "message": "%message",-->
+<!--          "requestId": "%X{X-Request-ID}"-->
+<!--          }-->
+<!--        </pattern>-->
+<!--      </message>-->
+<!--    </format>-->
+<!--  </appender>-->
+
+  <Appenders>
+    <Console name="Console">
+      <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} [%t] %-5p %C.%M():%L %X - %m%n"/>
+    </Console>
+
+    <RollingRandomAccessFile name="RollingFileAppender"
+      fileName="${logpath-location}/${logfile-name}"
+      filePattern="${archive}/${logfile-name}.%d{yyyy-MM-dd-HH}.gz">
+      <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} [%t] %-5p %c.%M ():%L %X - %m%n"/>
+      <Policies>
+        <TimeBasedTriggeringPolicy/>
+        <SizeBasedTriggeringPolicy size="1 MB"/>
+      </Policies>
+    </RollingRandomAccessFile>
+  </Appenders>
+
+  <Loggers>
+    <AsyncLogger name="com.wissensalt.springbootasynclogloki" level="TRACE" additivity="false"
+      includeLocation="true">
+      <AppenderRef ref="Console" level="DEBUG"/>
+      <AppenderRef ref="RollingFileAppender" level="DEBUG"/>
+    </AsyncLogger>
+
+    <AsyncLogger name="org.apache.logging.log4j.core.async" level="TRACE" additivity="false"
+      includeLocation="true">
+      <AppenderRef ref="Console" level="DEBUG"/>
+      <AppenderRef ref="RollingFileAppender" level="DEBUG"/>
+<!--      <AppenderRef ref="Loki" level="DEBUG"/>-->
+    </AsyncLogger>
+
+    <Root level="INFO" includeLocation="true">
+      <AppenderRef ref="Console" level="DEBUG"/>
+      <AppenderRef ref="RollingFileAppender" level="DEBUG"/>
+<!--      <appender-ref ref="Loki"/>-->
+    </Root>
+  </Loggers>
+
+</Configuration>
